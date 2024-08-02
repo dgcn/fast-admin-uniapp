@@ -15,15 +15,15 @@
 					<view class="demo-layout bg-purple-light">上传时间：{{fileInfo.create_date}}</view>
 				</u-col>
 				<u-col span="4">
-					<view class="demo-layout bg-purple">大小：232332 KB</view>
+					<view class="demo-layout bg-purple">大小：{{fileInfo.file_info_json.size}} KB</view>
 				</u-col>
 			</u-row>
 			<u-row customStyle="margin-bottom: 10px;" style="margin-top: 20px;">
 				<u-col span="8">
-					<view class="demo-layout bg-purple-light">收藏人数：1111</view>
+					<view class="demo-layout bg-purple-light">收藏人数：{{fileInfo.collect_count}}</view>
 				</u-col>
 				<u-col span="4">
-					<view class="demo-layout bg-purple">阅读人数：232332</view>
+					<view class="demo-layout bg-purple">阅读人数：{{fileInfo.read_count}}</view>
 				</u-col>
 			</u-row>
 		</view>
@@ -32,14 +32,20 @@
 			<u-row customStyle="margin-bottom: 10px">
 				<u-col span="4">
 					<view class="button-container" style="">
-						<span class="demo-layout bg-purple-light" @click="downloadFile()">下载预览 </span>
+						<span class="demo-layout bg-purple-light" @click="downloadFile">下载预览 </span>
 						<u-icon color="green" size="25" name="/static/icon/download.png"></u-icon>
 					</view>
 				</u-col>
-				<u-col span="4" class="button-col">
-					<view class="button-container">
+				<u-col span="4" class="button-col" v-if="!isCollected">
+					<view class="button-container" @click="onCollect(1)">
 						<span class="demo-layout bg-purple">立即收藏</span>
 						<u-icon class="icon-style" size="20" name="/static/icon/collected.png"></u-icon>
+					</view>
+				</u-col>
+				<u-col span="4" class="button-col" v-if="isCollected">
+					<view class="button-container" @click="onCollect(2)">
+						<span class="demo-layout bg-purple">取消收藏</span>
+						<u-icon class="icon-style" size="20" name="/static/icon/collecte.png"></u-icon>
 					</view>
 				</u-col>
 				<u-col span="4" class="button-col">
@@ -50,6 +56,7 @@
 				</u-col>
 			</u-row>
 		</view>
+		<u-alert description="温馨提示: 首次激励广告结束后,可获得文件操作权限" type="info"></u-alert>
 		<u-modal :title="titleModal" :content="modalContent" :show="showModal" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="保存" cancel-text="在线预览" @confirm="confirmModal"
 			@cancel="cancelModal" @close="closeModal"></u-modal>
@@ -63,6 +70,8 @@
 	import {
 		showUToast
 	} from '../../common/util.js'
+
+	var collectKey = "newDetailCollect"
 	export default {
 		data() {
 			return {
@@ -70,15 +79,16 @@
 				modalContent: "您已经获得该文件的操作权限，请选择",
 				showModal: false,
 				fileInfo: {},
-				tmpFileUrl: ''
+				tmpFileUrl: '',
+				isCollected: false,
 			};
 		},
 		onLoad(options) {
 			this.getInfo(options.id)
+			this.handleRead(options.id)
 		},
 		methods: {
 			getInfo(id) {
-
 				request({
 					url: '/api/upload/upload/getInfo',
 					method: 'GET',
@@ -91,8 +101,23 @@
 						return
 					}
 					this.fileInfo = res.data
+					this.checkCollect()
 				}).catch(error => {
 					console.error(error);
+				});
+			},
+			handleRead(id) {
+				console.log('handleRead', id)
+				request({
+					url: '/api/upload/upload/add_read',
+					method: 'GET',
+					data: {
+						id: id
+					}
+				}).then(res => {
+					console.log(111, res)
+				}).catch(error => {
+					console.error("handleRead_error", error);
 				});
 			},
 			downloadFile() {
@@ -117,19 +142,24 @@
 				})
 
 			},
-			onCollect(){
+			onCollect(status) {
 				console.log('onCollect')
-				uni.getUserProfile({
-					desc: '用于完善会员资料', // 必填，声明获取用户个人信息后的用途
-					success: (res) => {
-						console.log('userInfo', res.userInfo); // 输出用户信息
-						// 处理用户信息
-					},
-					fail: (err) => {
-						console.log('用户信息获取失败', err);
-						showUToast(this.$refs.uToast, 'error', err)
+				request({
+					url: '/api/upload/upload/collect',
+					method: 'GET',
+					data: {
+						id: this.fileInfo.id,
+						status: status
+					}
+				}).then(res => {
+					if (res.code != 200) {
+						showUToast(this.$refs.uToast, 'error', res.msg)
 						return
 					}
+					this.handleCollect(status)
+					showUToast(this.$refs.uToast, 'success', res.msg)
+				}).catch(error => {
+					console.error(error);
 				});
 			},
 			onShare() {
@@ -198,6 +228,43 @@
 			closeModal() {
 				console.log('closeModal')
 				this.showModal = false
+			},
+			checkCollect() {
+				var newDetailCollectList = uni.getStorageSync(collectKey)
+				newDetailCollectList = JSON.parse(newDetailCollectList)
+				if (newDetailCollectList[this.fileInfo.id]) {
+					this.isCollected = true
+				}
+			},
+			handleCollect(status) {
+				var newDetailCollectList = uni.getStorageSync(collectKey)
+				if (newDetailCollectList) {
+					newDetailCollectList = JSON.parse(newDetailCollectList)
+				} else {
+					newDetailCollectList = {}
+				}
+				var isExist = false
+				if (newDetailCollectList[this.fileInfo.id]) {
+					isExist = true
+				}
+				if (status == 1) {
+					if (!isExist) {
+						newDetailCollectList[this.fileInfo.id] = this.fileInfo
+						this.fileInfo.collect_count = this.fileInfo.collect_count + 1
+
+					}
+					this.isCollected = true
+				} else {
+					if (isExist) {
+						delete newDetailCollectList[this.fileInfo.id]
+						if (this.fileInfo.collect_count > 0) {
+							console.log(232323, this.fileInfo.collect_count)
+							this.fileInfo.collect_count = this.fileInfo.collect_count - 1
+						}
+					}
+					this.isCollected = false
+				}
+				uni.setStorageSync(collectKey, JSON.stringify(newDetailCollectList))
 			}
 		}
 	}

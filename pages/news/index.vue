@@ -10,7 +10,7 @@
 					</view>
 					<view class="item-content" style="margin-left: 15px; font-size: 13px;">
 						<span style="padding-top: 20px;">上传时间: {{ item.create_date }}</span>
-						<span style="display: inline; float: right; margin-right: 15px;background-color: green;color:white; padding: 2px 4px; border-radius: 3px;" :value="item.id" @click="OnNavigator(item.id)">在线浏览</span>
+						<span style="display: inline; float: right; margin-right: 15px;background-color: green;color:white; padding: 2px 4px; border-radius: 3px;" :value="item.id" @click="OnNavigator(item.id)">点击查看</span>
 					</view>
 				</view>
 			</u-list-item>
@@ -26,11 +26,14 @@
 			return {
 				currentTab: 0,
 				currentId: -1,
-				tabList: [{
+				tabList: [
+					{
 					name: '全部',
 					id: 0
-				}],
-				pageList: []
+				}
+				],
+				pageList: [
+				]
 			}
 		},
 		onLoad() {
