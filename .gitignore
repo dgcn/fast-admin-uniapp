@@ -1,2 +1,4 @@
 node_modules
 package-lock.json
+.hbuilderx/launch.json
+unpackage

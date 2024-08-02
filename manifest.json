@@ -1,5 +1,5 @@
 {
-    "name" : "test",
+    "name" : "file_admin",
     "appid" : "__UNI__61FF001",
     "description" : "",
     "versionName" : "1.0.0",
@@ -50,7 +50,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxf110dea8f5207b72",
         "setting" : {
             "urlCheck" : false
         },
