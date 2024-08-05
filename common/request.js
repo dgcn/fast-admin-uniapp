@@ -4,7 +4,7 @@ function request(options) {
 		  'Content-Type': 'application/json',
 		  'apiKey': '77a22aec393574d6328b9c066b7c9b5b'
 		}
-	var baseUrl = "http://47.115.54.72"
+	var baseUrl = "http://www.gdshangan.cn"
 	var url = baseUrl + options.url
 	const header = Object.assign({}, headerTmp, options.header);
 	uni.request({

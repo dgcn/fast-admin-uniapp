@@ -157,7 +157,7 @@
 						return
 					}
 					this.handleCollect(status)
-					showUToast(this.$refs.uToast, 'success', res.msg)
+					showUToast(this.$refs.uToast, 'success', '操作成功')
 				}).catch(error => {
 					console.error(error);
 				});
