@@ -122,7 +122,9 @@
 					data: {
 						id: id
 					}
-				}).then(res => {}).catch(error => {
+				}).then(res => {
+					this.fileInfo.read_count = this.fileInfo.read_count + 1
+				}).catch(error => {
 					console.error("handleRead_error", error);
 				});
 			},
@@ -217,7 +219,6 @@
 						})
 					}
 				});
-				this.showModal = false
 			},
 			closeModal() {
 				console.log('closeModal')
