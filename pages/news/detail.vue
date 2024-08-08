@@ -2,7 +2,8 @@
 	<view>
 		<u-toast ref="uToast"></u-toast>
 		<view class="img-style">
-			<u-icon space="20px" size="90" :name="'/static/icon/'+fileInfo.file_info_json.type+'.png'"
+			<u-icon space="20px" size="90"
+				:name="'/static/icon/'+(fileInfo.file_info_json.type != undefined ? fileInfo.file_info_json.type : 'xlsx')+'.png'"
 				style="background-color: red;"></u-icon>
 		</view>
 		<span
@@ -23,7 +24,7 @@
 					<view class="demo-layout bg-purple-light">收藏人数：{{fileInfo.collect_count}}</view>
 				</u-col>
 				<u-col span="4">
-					<view class="demo-layout bg-purple">阅读人数：{{fileInfo.read_count}}</view>
+					<view class="demo-layout bg-purple">阅读次数：{{fileInfo.read_count}}</view>
 				</u-col>
 			</u-row>
 		</view>
@@ -49,14 +50,21 @@
 					</view>
 				</u-col>
 				<u-col span="4" class="button-col">
-					<view class="button-container" @click="onShare">
-						<span class="demo-layout bg-purple">快速分享</span>
+					<view class="button-container">
+						<button open-type="share" class="demo-layout bg-purple" style="	display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: lightseagreen;
+		margin: auto;
+		height: 80rpx;
+		font-size: 14px;
+		">快速分享</button>
 						<u-icon class="icon-style" size="20" name="/static/icon/share.png"></u-icon>
 					</view>
 				</u-col>
 			</u-row>
 		</view>
-		<u-alert description="温馨提示: 首次激励广告结束后,可获得文件操作权限" type="info"></u-alert>
+		<u-alert description="温馨提示: 激励广告结束后,可获得文件操作权限" type="info"></u-alert>
 		<u-modal :title="titleModal" :content="modalContent" :show="showModal" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="保存" cancel-text="在线预览" @confirm="confirmModal"
 			@cancel="cancelModal" @close="closeModal"></u-modal>
@@ -75,7 +83,7 @@
 	export default {
 		data() {
 			return {
-				titleModal: "文件上传附件提醒您",
+				titleModal: "岗位表单",
 				modalContent: "您已经获得该文件的操作权限，请选择",
 				showModal: false,
 				fileInfo: {},
@@ -114,9 +122,7 @@
 					data: {
 						id: id
 					}
-				}).then(res => {
-					console.log(111, res)
-				}).catch(error => {
+				}).then(res => {}).catch(error => {
 					console.error("handleRead_error", error);
 				});
 			},
@@ -134,6 +140,15 @@
 					},
 					fail: (e) => {
 						console.log(e, '文件下载失败')
+						request({
+							url: '/api/upload/upload/export_err',
+							method: 'POST',
+							data: {
+								err: JSON.stringify(e)
+							}
+						}).then(res => {}).catch(error => {
+							console.error("handleRead_error", error);
+						});
 						uni.showToast({
 							title: '文件下载失败',
 							icon: "error",
@@ -162,49 +177,26 @@
 					console.error(error);
 				});
 			},
-			onShare() {
-				console.log('onShare')
-				uni.showShareMenu({
-					title: this.fileInfo.name,
-					path: '/pages/news/detail',
-					imageUrl: '/static/icon/' + this.fileInfo.file_info_json.type + '.png',
-					success: function(res) {
-						console.log('分享成功', res);
-					},
-					fail: function(err) {
-						console.error('分享失败', err);
-						uni.showToast({
-							title: '分享失败',
-							icon: "error",
-						})
-					}
-				});
+			onShareAppMessage(e) {
+				let shareobj = {
+					title: this.fileInfo.file_info_json.full_name, //分享的标题
+					path: '/pages/news/detail?id=' + this.fileInfo.id, //好友点击分享之后跳转的页面
+					imageUrl: "/static/icon/" + this.fileInfo.file_info_json.type + ".png", //内容图片
+				}
+				return shareobj //一定要返回对象
 			},
 			confirmModal() {
-				console.log('confirmModal')
-				if (uni.getSystemInfoSync().platform === 'mp-weixin') {
-					// 调用微信小程序的发送消息接口
-					wx.sendMessageFile({
-						filePath: this.tmpFileUrl, // 文件路径
-						success: function(res) {
-							console.log('文件已发送给好友', res);
-						},
-						fail: function(err) {
-							console.error('发送文件失败：', err);
-							uni.showToast({
-								title: '发送文件失败',
-								icon: "error",
-							})
-						}
-					});
-					this.showModal = false
-				} else {
-					console.error('该功能仅支持微信小程序环境');
-					uni.showToast({
-						title: '该功能仅支持微信小程序环境',
-						icon: "error",
-					})
-				}
+				// 调用分享接口
+				uni.shareFileMessage({
+					filePath: this.tmpFileUrl,
+					fileName: this.fileInfo.file_info_json.full_name,
+					success: () => {
+						console.log(err, '分享文件成功');
+					},
+					fail: (err) => {
+						console.log(err, '分享文件失败');
+					}
+				});
 
 			},
 			cancelModal() {
@@ -231,10 +223,13 @@
 			},
 			checkCollect() {
 				var newDetailCollectList = uni.getStorageSync(collectKey)
-				newDetailCollectList = JSON.parse(newDetailCollectList)
-				if (newDetailCollectList[this.fileInfo.id]) {
-					this.isCollected = true
+				if (newDetailCollectList != "") {
+					newDetailCollectList = JSON.parse(newDetailCollectList)
+					if (newDetailCollectList[this.fileInfo.id]) {
+						this.isCollected = true
+					}
 				}
+
 			},
 			handleCollect(status) {
 				var newDetailCollectList = uni.getStorageSync(collectKey)
@@ -258,7 +253,6 @@
 					if (isExist) {
 						delete newDetailCollectList[this.fileInfo.id]
 						if (this.fileInfo.collect_count > 0) {
-							console.log(232323, this.fileInfo.collect_count)
 							this.fileInfo.collect_count = this.fileInfo.collect_count - 1
 						}
 					}
