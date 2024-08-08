@@ -185,6 +185,36 @@
 				}
 				return shareobj //一定要返回对象
 			},
+			// onShare() {
+			// 	console.log('onShare')
+			// uni.showShareMenu({
+			// 	title: this.fileInfo.name,
+			// 	path: '/pages/news/detail',
+			// 	imageUrl: '/static/icon/' + this.fileInfo.file_info_json.type + '.png',
+			// 	success: function(res) {
+			// 		console.log('分享成功', res);
+			// 	},
+			// 	fail: function(err) {
+			// 		console.error('分享失败', err);
+			// 		uni.showToast({
+			// 			title: '分享失败',
+			// 			icon: "error",
+			// 		})
+			// 	}
+			// });
+
+			// const shareParams = {
+			// 	title: '分享的标题',
+			// 	path: '/pages/index/index',
+			// 	imageUrl: '/static/share.jpg', // 分享的图片
+			// };
+
+			// // 更新分享菜单
+			// wx.updateShareMenu({
+			// 	withShareTicket: true,
+			// 	...shareParams,
+			// });
+			// },
 			confirmModal() {
 				// 调用分享接口
 				uni.shareFileMessage({
