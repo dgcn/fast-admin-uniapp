@@ -4,9 +4,12 @@ import App from './App'
 import Vue from 'vue'
 import './uni.promisify.adaptor'
 import uView from '@/uni_modules/uview-ui'
+import share from './common/share.js'
 Vue.use(uView)
 Vue.config.productionTip = false
 App.mpType = 'app'
+// 导入并挂载全局的分享方法
+Vue.mixin(share)
 
 const app = new Vue({
   ...App

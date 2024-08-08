@@ -24,7 +24,7 @@
 					<view class="demo-layout bg-purple-light">收藏人数：{{fileInfo.collect_count}}</view>
 				</u-col>
 				<u-col span="4">
-					<view class="demo-layout bg-purple">阅读次数：{{fileInfo.read_count}}</view>
+					<view class="demo-layout bg-purple">下载人数：{{fileInfo.read_count}}</view>
 				</u-col>
 			</u-row>
 		</view>
@@ -64,7 +64,7 @@
 				</u-col>
 			</u-row>
 		</view>
-		<u-alert description="温馨提示: 激励广告结束后,可获得文件操作权限" type="info"></u-alert>
+		<!-- <u-alert description="温馨提示: 激励广告结束后,可获得文件操作权限" type="info"></u-alert> -->
 		<u-modal :title="titleModal" :content="modalContent" :show="showModal" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="保存" cancel-text="在线预览" @confirm="confirmModal"
 			@cancel="cancelModal" @close="closeModal"></u-modal>
@@ -127,6 +127,7 @@
 				});
 			},
 			downloadFile() {
+				this.handleRead(this.fileInfo.id)
 				uni.downloadFile({ //只能是GET请求
 					url: this.fileInfo.file_info_json.full_url, //请求地址(后台返回的码流地址)
 					success: (res) => {
@@ -185,36 +186,6 @@
 				}
 				return shareobj //一定要返回对象
 			},
-			// onShare() {
-			// 	console.log('onShare')
-			// uni.showShareMenu({
-			// 	title: this.fileInfo.name,
-			// 	path: '/pages/news/detail',
-			// 	imageUrl: '/static/icon/' + this.fileInfo.file_info_json.type + '.png',
-			// 	success: function(res) {
-			// 		console.log('分享成功', res);
-			// 	},
-			// 	fail: function(err) {
-			// 		console.error('分享失败', err);
-			// 		uni.showToast({
-			// 			title: '分享失败',
-			// 			icon: "error",
-			// 		})
-			// 	}
-			// });
-
-			// const shareParams = {
-			// 	title: '分享的标题',
-			// 	path: '/pages/index/index',
-			// 	imageUrl: '/static/share.jpg', // 分享的图片
-			// };
-
-			// // 更新分享菜单
-			// wx.updateShareMenu({
-			// 	withShareTicket: true,
-			// 	...shareParams,
-			// });
-			// },
 			confirmModal() {
 				// 调用分享接口
 				uni.shareFileMessage({
@@ -227,7 +198,7 @@
 						console.log(err, '分享文件失败');
 					}
 				});
-
+				this.showModal = false
 			},
 			cancelModal() {
 				console.log('cancelModal')
@@ -246,6 +217,7 @@
 						})
 					}
 				});
+				this.showModal = false
 			},
 			closeModal() {
 				console.log('closeModal')
