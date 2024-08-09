@@ -41,19 +41,6 @@
 			}
 		},
 		onLoad() {
-			uni.showShareMenu({
-				withShareTicket: true,
-				menus: ['shareAppMessage', 'shareTimeline'],
-				title: '分享的标题',
-				path: '/pages/index/index',
-				imageUrl: '/static/logo.png',
-				success: function() {
-					console.log('分享菜单设置成功');
-				},
-				fail: function(err) {
-					console.error('分享菜单设置失败', err);
-				}
-			});
 			// 加载分类
 			this.getUploadClassifyList()
 			this.getUploadFileList(this.currentTab, this.currentId)
