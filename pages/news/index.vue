@@ -1,6 +1,6 @@
 <template>
 	<view class="content" style="">
-		<u-tabs :list="tabList" @click="clickTab" :current="currentTab"></u-tabs>
+		<!-- <u-tabs :list="tabList" @click="clickTab" :current="currentTab"></u-tabs> -->
 		<u-list @scrolltolower="scrolltolower" style="background-color: gray !important;">
 			<u-list-item v-for="(item, index) in pageList" :key="index" style="padding: 10px 0; ">
 				<view class="item" @click="toOperate(item)"
