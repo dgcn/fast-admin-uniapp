@@ -1,7 +1,7 @@
 <template>
 	<view class="float-icon" :style="{right: right + 'px', bottom: bottom + 'px'}" @touchstart="touchStart"
 		@touchmove="touchMove" @touchend="touchEnd">
-		<image src="/static/logo.png" style="width: 50rpx;height: 50rpx;" @click="onClick"></image>
+		<image src="/static/icon/share_1.png" style="width: 50rpx;height: 50rpx;" @click="onClick"></image>
 	</view>
 </template>
 <script>
@@ -42,8 +42,8 @@
 <style>
 	.float-icon {
 		position: fixed;
-		width: 50px;
-		height: 50px;
+		width: 40px;
+		height: 40px;
 		border-radius: 25px;
 		background-color: #83deff;
 		display: flex;
