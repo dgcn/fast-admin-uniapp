@@ -139,10 +139,7 @@
 				this.isShowSelect = true
 			},
 			onShareNews(values) {
-				console.log(1111)
-				var ids = []
 				var searchData = this.searchData
-
 				// 当前页面发起跳转，并传递参数
 				const targetPage = '/pages/news/search_list';
 
@@ -153,7 +150,6 @@
 
 				// 拼接URL
 				const url = `${targetPage}?${queryString}`;
-				console.log(searchData, url)
 				// 跳转到目标页面
 				uni.navigateTo({
 					url: url

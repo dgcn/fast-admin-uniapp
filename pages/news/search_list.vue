@@ -22,7 +22,7 @@
 			return {
 				searchData: {
 					name: '',
-					ids: []
+					ids: ''
 				},
 				pageList: []
 			}
@@ -32,7 +32,7 @@
 		},
 		methods: {
 			scrolltolower() {
-				this.getUploadFileList(this.currentTab, this.currentId)
+				this.getUploadFileList()
 			},
 			getUploadFileList(tabIndex, uploadClassifyId) {
 				request({
