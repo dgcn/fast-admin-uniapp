@@ -64,7 +64,7 @@
 				</u-col>
 			</u-row>
 		</view>
-		<!-- <u-alert description="温馨提示: 激励广告结束后,可获得文件操作权限" type="info"></u-alert> -->
+		<u-alert description="温馨提示: 激励广告结束后,可获得文件操作权限" type="info"></u-alert>
 		<u-modal :title="titleModal" :content="modalContent" :show="showModal" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="保存" cancel-text="在线预览" @confirm="confirmModal"
 			@cancel="cancelModal" @close="closeModal"></u-modal>
@@ -94,6 +94,7 @@
 		onLoad(options) {
 			this.getInfo(options.id)
 			this.handleRead(options.id)
+			this.initRewardedVideoAd()
 		},
 		methods: {
 			getInfo(id) {
@@ -133,12 +134,18 @@
 				uni.downloadFile({ //只能是GET请求
 					url: this.fileInfo.file_info_json.full_url, //请求地址(后台返回的码流地址)
 					success: (res) => {
+						console.log(233, res)
 						//下载成功
 						if (res.statusCode === 200) {
 							//保存文件
 							let tempFile = res.tempFilePath;
 							this.tmpFileUrl = tempFile
-							this.showModal = true
+							this.showRewardedVideoAd()
+						} else {
+							uni.showToast({
+								title: '文件下载失败',
+								icon: "error",
+							})
 						}
 					},
 					fail: (e) => {
@@ -262,7 +269,43 @@
 					this.isCollected = false
 				}
 				uni.setStorageSync(collectKey, JSON.stringify(newDetailCollectList))
-			}
+			},
+			// 初始化激励视频广告
+			initRewardedVideoAd() {
+				const ad = uni.createRewardedVideoAd({
+					adUnitId: 'adunit-5ccc3e2fe3e0b44e'
+				});
+				ad.onLoad(() => {
+					console.log('视频广告加载成功');
+				});
+				ad.onError((err) => {
+					console.log('视频广告加载失败', err);
+					uni.showToast({
+						title: '视频广告加载失败',
+						icon: "error",
+					})
+				});
+				ad.onClose((res) => {
+					if (res && res.isEnded) {
+						// 用户观看完视频，发放奖励
+						console.log('视频广告播放结束');
+						this.showModal = true
+					} else {
+						// 用户没有完整观看视频，给出提示
+						console.log('视频广告被关闭');
+					}
+				});
+				this.rewardedVideoAd = ad;
+			},
+			// 展示激励视频广告
+			showRewardedVideoAd() {
+				if (this.rewardedVideoAd) {
+					this.rewardedVideoAd.show()
+						.catch(err => {
+							console.error(err);
+						});
+				}
+			},
 		}
 	}
 </script>

@@ -1,23 +1,28 @@
 <template>
-	<view class="content" style="">
+	<view class="">
+		<view class="u-demo-block__content m-t-10">
+			<u-row customStyle="margin-bottom: 10px">
+				<u-col span="2">
+					<view class=""
+						style="background-color: lightgray; text-align: center; margin: auto;width: 100%;height: 100%;padding: 6px 0; border-radius: 1px;">
+						<span @click="onSelectSearch" style="font-size: 13px;">{{defaultSelect}}</span>
+					</view>
+				</u-col>
+				<u-col span="10">
+					<u-search v-model="searchName" :show-action="false" shape="square"
+						@search="onChangeSearch"></u-search>
+				</u-col>
+			</u-row>
+		</view>
+		<u-picker :show="isShowSelect" :columns="selectColumns" @close="onCloseSearch" @confirm="onConfirmSearch"
+			@cancel="onCancelSearch"></u-picker>
+
 		<!-- <u-tabs :list="tabList" @click="clickTab" :current="currentTab"></u-tabs> -->
-		<u-list @scrolltolower="scrolltolower" style="background-color: gray !important;">
-			<u-list-item v-for="(item, index) in pageList" :key="index" style="padding: 10px 0; ">
-				<view class="item" @click="toOperate(item)"
-					style="margin: 10px 5px 0; border-radius: 5px; border: solid 1px gray;padding: 9px 5px;">
-					<view class="item-img">
-						<u-icon :label="item.file_info_json.full_name" space="20px" size="60"
-							:name="'/static/icon/'+item.file_info_json.type+'.png'"></u-icon>
-					</view>
-					<view class="item-content" style="margin-left: 15px; font-size: 13px;">
-						<span style="padding-top: 20px;">上传时间: {{ item.create_date }}</span>
-						<span
-							style="display: inline; float: right; margin-right: 15px;background-color: green;color:white; padding: 2px 4px; border-radius: 3px;"
-							:value="item.id" @click="OnNavigator(item.id)">点击查看</span>
-					</view>
-				</view>
-			</u-list-item>
-		</u-list>
+		<view class="content" style="">
+			<itemList @scrolltolower="scrolltolower" :pageList="pageList" />
+		</view>
+		<dragBall @click-event="onShareNews" v-if="pageList.length > 0"></dragBall>
+		<!-- <footerTabar /> -->
 	</view>
 </template>
 
@@ -28,7 +33,15 @@
 	import {
 		showUToast
 	} from '../../common/util.js'
+	import itemList from './item_list.vue'
+	import footerTabar from '../common/tabar.vue'
+	import dragBall from '../common/drag.vue';
 	export default {
+		components: {
+			footerTabar,
+			dragBall,
+			itemList
+		},
 		data() {
 			return {
 				currentTab: 0,
@@ -37,7 +50,19 @@
 					name: '全部',
 					id: 0
 				}],
-				pageList: []
+				pageList: [],
+				searchData: {
+					name: '',
+					ids: "",
+					status: 1,
+					upload_classify_id: -1,
+				},
+				searchName: '',
+				isShowSelect: false,
+				defaultSelect: '名称',
+				selectColumns: [
+					['名称', 'ID']
+				],
 			}
 		},
 		onLoad() {
@@ -47,17 +72,20 @@
 		},
 		methods: {
 			clickTab(value, index) {
-				this.getUploadFileList(value.index, value.id)
+				this.searchData.upload_classify_id = value.id
+				this.currentId =  value.id
+				this.currentTab = value.index
+				this.getUploadFileList()
 			},
 			scrolltolower() {
-				this.getUploadFileList(this.currentTab, this.currentId)
+				this.getUploadFileList()
 			},
 			getUploadClassifyList() {
 				request({
 					url: '/api/upload/classify/list',
 					method: 'GET',
 					data: {
-						status: 1
+						status: 1,
 					}
 				}).then(res => {
 					console.log(res);
@@ -71,36 +99,66 @@
 					showUToast(this.$refs.uToast, 'error', res.msg)
 				});
 			},
-			getUploadFileList(tabIndex, uploadClassifyId) {
+			getUploadFileList() {
 				request({
 					url: '/api/upload/upload/list',
 					method: 'GET',
-					data: {
-						status: 1,
-						upload_classify_id: uploadClassifyId
-					}
+					data: this.searchData
 				}).then(res => {
 					if (res.code != 200) {
 						showUToast(this.$refs.uToast, 'error', res.msg)
 						return
 					}
 					this.pageList = res.data.list
-					this.currentTab = tabIndex
-					this.currentId = uploadClassifyId
 				}).catch(error => {
 					console.error(error);
 					showUToast(this.$refs.uToast, 'error', res.msg)
 				});
 			},
-			onlineLook() {
-				console.log('onlineLook')
+			onChangeSearch() {
+				if (this.defaultSelect == "ID") {
+					this.searchData.ids = this.searchName
+				} else {
+					this.searchData.name = this.searchName
+				}
+				this.getUploadFileList()
 			},
-			OnNavigator(id) {
+			onCloseSearch() {
+				// console.log('close');
+				this.isShowSelect = false
+			},
+			onConfirmSearch(e) {
+				this.isShowSelect = false
+				this.defaultSelect = e.value[0]
+			},
+			onCancelSearch() {
+				// console.log('cancel');
+				this.isShowSelect = false
+			},
+			onSelectSearch() {
+				this.isShowSelect = true
+			},
+			onShareNews(values) {
+				console.log(1111)
+				var ids = []
+				var searchData = this.searchData
+
+				// 当前页面发起跳转，并传递参数
+				const targetPage = '/pages/news/search_list';
+
+				// 序列化参数
+				const queryString = Object.keys(searchData)
+					.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(searchData[key])}`)
+					.join('&');
+
+				// 拼接URL
+				const url = `${targetPage}?${queryString}`;
+				console.log(searchData, url)
+				// 跳转到目标页面
 				uni.navigateTo({
-					url: `/pages/news/detail?id=${id}`
+					url: url
 				});
-			},
-			toOperate() {}
+			}
 		}
 	}
 </script>
@@ -130,5 +188,10 @@
 	.title {
 		font-size: 36rpx;
 		color: #8f8f94;
+	}
+
+	.container2 {
+		padding-bottom: 100rpx;
+		/* 确保按钮不会被页面内容遮挡 */
 	}
 </style>
