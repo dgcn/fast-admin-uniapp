@@ -18,7 +18,7 @@
 			@cancel="onCancelSearch"></u-picker>
 
 		<!-- <u-tabs :list="tabList" @click="clickTab" :current="currentTab"></u-tabs> -->
-		<view class="content" style="">
+		<view class="content11">
 			<itemList @scrolltolower="scrolltolower" :pageList="pageList" />
 		</view>
 		<dragBall @click-event="onShareNews" v-if="pageList.length > 0"></dragBall>
@@ -144,12 +144,10 @@
 				const targetPage = '/pages/news/search_list';
 
 				// 序列化参数
-				const queryString = Object.keys(searchData)
-					.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(searchData[key])}`)
-					.join('&');
+				const queryString = JSON.stringify(searchData);
 
 				// 拼接URL
-				const url = `${targetPage}?${queryString}`;
+				const url = `${targetPage}?arrayData=${queryString}`;
 				// 跳转到目标页面
 				uni.navigateTo({
 					url: url
@@ -160,7 +158,7 @@
 </script>
 
 <style>
-	.content {
+	.content11 {
 		display: flex;
 		flex-direction: column;
 		align-items: center;

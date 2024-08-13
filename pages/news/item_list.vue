@@ -1,6 +1,6 @@
 <template>
-	<view>
-		<u-list @scrolltolower="scrolltolower" style="background-color: gray !important;">
+	<view style="width: 100vw;">
+		<u-list @scrolltolower="scrolltolower">
 			<u-list-item v-for="(item, index) in pageList" :key="index" style="padding: 10px 0; ">
 				<view class="item" @click="toOperate(item)"
 					style="margin: 1px 5px 0; border-radius: 5px; border: solid 1px gray;padding: 9px 5px;">

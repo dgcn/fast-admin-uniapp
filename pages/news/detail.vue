@@ -20,9 +20,9 @@
 				</u-col>
 			</u-row>
 			<u-row customStyle="margin-bottom: 10px;" style="margin-top: 20px;">
-				<u-col span="8">
+				<!-- 	<u-col span="8">
 					<view class="demo-layout bg-purple-light">收藏人数：{{fileInfo.collect_count}}</view>
-				</u-col>
+				</u-col> -->
 				<u-col span="4">
 					<view class="demo-layout bg-purple">下载人数：{{fileInfo.read_count}}</view>
 				</u-col>
@@ -31,13 +31,13 @@
 
 		<view>
 			<u-row customStyle="margin-bottom: 10px">
-				<u-col span="4">
-					<view class="button-container" style="">
-						<span class="demo-layout bg-purple-light" @click="downloadFile">下载预览 </span>
+				<u-col span="6" @click="downloadFileButton">
+					<view class="button-container">
+						<span class="demo-layout bg-purple-light">下载预览 </span>
 						<u-icon color="green" size="25" name="/static/icon/download.png"></u-icon>
 					</view>
 				</u-col>
-				<u-col span="4" class="button-col" v-if="!isCollected">
+				<!-- 			<u-col span="4" class="button-col" v-if="!isCollected">
 					<view class="button-container" @click="onCollect(1)">
 						<span class="demo-layout bg-purple">立即收藏</span>
 						<u-icon class="icon-style" size="20" name="/static/icon/collected.png"></u-icon>
@@ -48,26 +48,21 @@
 						<span class="demo-layout bg-purple">取消收藏</span>
 						<u-icon class="icon-style" size="20" name="/static/icon/collecte.png"></u-icon>
 					</view>
-				</u-col>
-				<u-col span="4" class="button-col">
-					<view class="button-container">
-						<button open-type="share" class="demo-layout bg-purple" style="	display: flex;
-		justify-content: center;
-		align-items: center;
-		background-color: lightseagreen;
-		margin: auto;
-		height: 80rpx;
-		font-size: 14px;
-		">快速分享</button>
+				</u-col> -->
+				<u-col span="6" class="button-col" >
+					<button open-type="share" class="open-share1" style="margin-right: 25px;">快速分享
 						<u-icon class="icon-style" size="20" name="/static/icon/share.png"></u-icon>
-					</view>
+					</button>
 				</u-col>
 			</u-row>
 		</view>
-		<u-alert description="温馨提示: 激励广告结束后,可获得文件操作权限" type="info"></u-alert>
+		<!-- <u-alert description="温馨提醒：观看完整视频后，即可获得岗位附件" type="warning"></u-alert> -->
 		<u-modal :title="titleModal" :content="modalContent" :show="showModal" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="保存" cancel-text="在线预览" @confirm="confirmModal"
 			@cancel="cancelModal" @close="closeModal"></u-modal>
+		<u-modal title="温馨提示" content="观看一次视频，即可下载岗位附件" :show="showModal2" showCancelButton closeOnClickOverlay
+			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="确认" cancel-text="取消" @confirm="confirmModal2"
+			@cancel="cancelModal2" @close="closeModal2"></u-modal>
 	</view>
 </template>
 
@@ -89,6 +84,7 @@
 				fileInfo: {},
 				tmpFileUrl: '',
 				isCollected: false,
+				showModal2: false
 			};
 		},
 		onLoad(options) {
@@ -129,6 +125,9 @@
 					console.error("handleRead_error", error);
 				});
 			},
+			downloadFileButton() {
+				this.showModal2 = true
+			},
 			downloadFile() {
 				this.handleRead(this.fileInfo.id)
 				uni.downloadFile({ //只能是GET请求
@@ -141,6 +140,7 @@
 							let tempFile = res.tempFilePath;
 							this.tmpFileUrl = tempFile
 							this.showRewardedVideoAd()
+							this.showModal2 = false
 						} else {
 							uni.showToast({
 								title: '文件下载失败',
@@ -288,11 +288,14 @@
 				ad.onClose((res) => {
 					if (res && res.isEnded) {
 						// 用户观看完视频，发放奖励
-						console.log('视频广告播放结束');
 						this.showModal = true
 					} else {
 						// 用户没有完整观看视频，给出提示
-						console.log('视频广告被关闭');
+						uni.showToast({
+							title: '观看完视频才可以获取岗位附件哦',
+							icon: "none",
+							duration: 2000
+						})
 					}
 				});
 				this.rewardedVideoAd = ad;
@@ -300,12 +303,20 @@
 			// 展示激励视频广告
 			showRewardedVideoAd() {
 				if (this.rewardedVideoAd) {
-					this.rewardedVideoAd.show()
-						.catch(err => {
-							console.error(err);
-						});
+					this.rewardedVideoAd.show().catch(err => {
+						console.error(err);
+					});
 				}
 			},
+			confirmModal2() {
+				this.downloadFile()
+			},
+			cancelModal2() {
+				this.showModal2 = false
+			},
+			closeModal2() {
+				this.showModal2 = false
+			}
 		}
 	}
 </script>
@@ -321,13 +332,11 @@
 		justify-content: center;
 		align-items: center;
 		height: 80rpx;
-		/* background-color: green; */
 		background-color: lightseagreen;
 		width: 80%;
 		margin: auto;
 		border-radius: 9px;
 		font-size: 15px;
-
 	}
 
 	.img-style {
@@ -336,5 +345,15 @@
 		align-items: center;
 		margin-top: 30px;
 		height: 100rpx;
+	}
+
+	.open-share1 {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: lightseagreen;
+		margin: auto;
+		height: 80rpx;
+		font-size: 14px;
 	}
 </style>

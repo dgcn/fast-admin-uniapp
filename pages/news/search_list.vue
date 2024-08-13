@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view class="content" style="">
+		<view class="content">
 			<itemList @scrolltolower="scrolltolower" :pageList="pageList" />
 		</view>
 	</view>
@@ -22,12 +22,19 @@
 			return {
 				searchData: {
 					name: '',
-					ids: ''
+					ids: '',
+					upload_classify_id: '',
+					status: ''
 				},
 				pageList: []
 			}
 		},
 		onLoad(options){
+			  if (options.arrayData) {
+			      // 将接收到的字符串转换回数组
+			      const receivedArrayData = JSON.parse(decodeURIComponent(options.arrayData));
+				  this.searchData =receivedArrayData
+			    }
 			this.getUploadFileList()
 		},
 		methods: {
@@ -35,6 +42,7 @@
 				this.getUploadFileList()
 			},
 			getUploadFileList(tabIndex, uploadClassifyId) {
+				console.log(333, this.searchData)
 				request({
 					url: '/api/upload/upload/list',
 					method: 'GET',
