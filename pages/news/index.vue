@@ -73,7 +73,7 @@
 		methods: {
 			clickTab(value, index) {
 				this.searchData.upload_classify_id = value.id
-				this.currentId =  value.id
+				this.currentId = value.id
 				this.currentTab = value.index
 				this.getUploadFileList()
 			},
@@ -143,6 +143,13 @@
 				// 当前页面发起跳转，并传递参数
 				const targetPage = '/pages/news/search_list';
 
+				var ids = []
+
+				for (var i = 0; i < this.pageList.length; i++) {
+					ids.push(this.pageList[i]['id'])
+				}
+
+				this.searchData.ids = ids.join(',')
 				// 序列化参数
 				const queryString = JSON.stringify(searchData);
 

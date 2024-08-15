@@ -42,7 +42,6 @@
 				this.getUploadFileList()
 			},
 			getUploadFileList(tabIndex, uploadClassifyId) {
-				console.log(333, this.searchData)
 				request({
 					url: '/api/upload/upload/list',
 					method: 'GET',
