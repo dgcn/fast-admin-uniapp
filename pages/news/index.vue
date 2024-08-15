@@ -101,7 +101,7 @@
 			},
 			getUploadFileList() {
 				request({
-					url: '/api/upload/upload/list',
+					url: '/api/upload/upload/list_search',
 					method: 'GET',
 					data: this.searchData
 				}).then(res => {

@@ -63,6 +63,9 @@
 		<u-modal title="温馨提示" content="观看一次视频，即可下载岗位附件" :show="showModal2" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="确认" cancel-text="取消" @confirm="confirmModal2"
 			@cancel="cancelModal2" @close="closeModal2"></u-modal>
+			
+		<u-modal title="温馨提示" content="文件正在下载中....." :show="showModal3" showCancelButton closeOnClickOverlay
+				confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="确认" :showConfirmButton="false" :showCancelButton="false"></u-modal>
 	</view>
 </template>
 
@@ -84,7 +87,8 @@
 				fileInfo: {},
 				tmpFileUrl: '',
 				isCollected: false,
-				showModal2: false
+				showModal2: false,
+				showModal3: false
 			};
 		},
 		onLoad(options) {
@@ -139,8 +143,8 @@
 							//保存文件
 							let tempFile = res.tempFilePath;
 							this.tmpFileUrl = tempFile
-							this.showRewardedVideoAd()
-							this.showModal2 = false
+							this.showModal = true
+							this.showModal3 = false
 						} else {
 							uni.showToast({
 								title: '文件下载失败',
@@ -288,7 +292,8 @@
 				ad.onClose((res) => {
 					if (res && res.isEnded) {
 						// 用户观看完视频，发放奖励
-						this.showModal = true
+						this.showModal3 = true
+						this.downloadFile()
 					} else {
 						// 用户没有完整观看视频，给出提示
 						uni.showToast({
@@ -309,7 +314,8 @@
 				}
 			},
 			confirmModal2() {
-				this.downloadFile()
+				this.showRewardedVideoAd()
+				this.showModal2 = false
 			},
 			cancelModal2() {
 				this.showModal2 = false
