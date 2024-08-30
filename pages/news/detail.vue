@@ -81,7 +81,7 @@
 	export default {
 		data() {
 			return {
-				titleModal: "附件表单",
+				titleModal: "上岗附件表",
 				modalContent: "您已经获得该文件的操作权限，请选择",
 				showModal: false,
 				fileInfo: {},
