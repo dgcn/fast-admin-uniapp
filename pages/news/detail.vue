@@ -277,7 +277,7 @@
 			// 初始化激励视频广告
 			initRewardedVideoAd() {
 				const ad = uni.createRewardedVideoAd({
-					adUnitId: 'adunit-5ccc3e2fe3e0b44e'
+					adUnitId: 'adunit-9afd52e76eea1146'
 				});
 				ad.onLoad(() => {
 					console.log('视频广告加载成功');
