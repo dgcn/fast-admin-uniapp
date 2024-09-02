@@ -60,7 +60,7 @@
 		<u-modal :title="titleModal" :content="modalContent" :show="showModal" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="保存" cancel-text="在线预览" @confirm="confirmModal"
 			@cancel="cancelModal" @close="closeModal"></u-modal>
-		<u-modal title="温馨提示" content="观看一次视频，即可下载上岗附件" :show="showModal2" showCancelButton closeOnClickOverlay
+		<u-modal title="温馨提示" content="观看一次视频，即可下载上岸附件" :show="showModal2" showCancelButton closeOnClickOverlay
 			confirm-color="#00BFFF" cancel-color="#00BFFF" confirm-text="确认" cancel-text="取消" @confirm="confirmModal2"
 			@cancel="cancelModal2" @close="closeModal2"></u-modal>
 			
@@ -81,7 +81,7 @@
 	export default {
 		data() {
 			return {
-				titleModal: "上岗附件表",
+				titleModal: "上岸附件表",
 				modalContent: "您已经获得该文件的操作权限，请选择",
 				showModal: false,
 				fileInfo: {},
@@ -297,7 +297,7 @@
 					} else {
 						// 用户没有完整观看视频，给出提示
 						uni.showToast({
-							title: '观看完视频才可以获取上岗附件哦',
+							title: '观看完视频才可以获取上岸附件哦',
 							icon: "none",
 							duration: 2000
 						})
